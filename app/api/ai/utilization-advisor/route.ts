@@ -6,7 +6,7 @@ import { EquipmentItem } from '@/lib/types';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const equipmentList: EquipmentItem[] = body.equipment && body.equipment.length > 0 
+    const equipmentList: EquipmentItem[] = body.equipment && Array.isArray(body.equipment) && body.equipment.length > 0 
       ? body.equipment 
       : INITIAL_EQUIPMENT;
 
@@ -16,9 +16,10 @@ export async function POST(req: NextRequest) {
       success: true,
       data: metrics
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : 'Failed to compute utilization metrics';
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to compute utilization metrics' },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

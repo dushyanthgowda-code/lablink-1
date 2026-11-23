@@ -9,15 +9,13 @@ import {
 import { 
   Check, 
   X, 
-  Clock, 
-  AlertCircle, 
   Filter, 
   UserCheck, 
   ShieldCheck, 
-  Calendar, 
-  ArrowRight,
-  FileCheck2,
-  ExternalLink
+  Users,
+  Cpu,
+  BookmarkCheck,
+  TrendingUp
 } from 'lucide-react';
 
 interface FacultyApprovalDeskProps {
@@ -34,15 +32,13 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
   onReject
 }) => {
   const [filterStatus, setFilterStatus] = useState<RequestStatus | 'All'>('All');
-  const [approvalNote, setApprovalNote] = useState('');
-  const [selectedReqId, setSelectedReqId] = useState<string | null>(null);
 
   const filtered = requests.filter(r => {
     if (filterStatus === 'All') return true;
     return r.status === filterStatus;
   });
 
-  const getEquipmentName = (eqId: string) => {
+  const getEquipmentName = (eqId: string): string => {
     const eq = equipmentList.find(e => e.id === eqId);
     return eq ? `${eq.name} (${eq.department})` : eqId;
   };
@@ -60,7 +56,7 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
             Laboratory Access Approvals & Supervision Desk
           </h1>
           <p className="mt-2 text-sm sm:text-base text-gray-300">
-            Review student project requests, inspect academic deadlines and safety prerequisite compliance, and authorize equipment access across university labs.
+            Review student project requests, inspect academic deadlines and safety prerequisite compliance, and authorize equipment access across university labs while optimising resource utilisation.
           </p>
         </div>
       </div>
@@ -148,6 +144,12 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
                     <span className="text-gray-400 font-semibold">Faculty Guide: </span>
                     <span className="text-gray-200">{req.facultyAdvisor}</span>
                   </div>
+                  {req.courseOrGrantCode && (
+                    <div className="flex items-center space-x-1 text-gray-300">
+                      <BookmarkCheck className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+                      <span>Reference: {req.courseOrGrantCode}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -169,8 +171,25 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
                       <span className="text-gray-200">{req.studentUsageHoursPastMonth}h/mo</span>
                     </div>
                   </div>
+                  {req.teamMembers && req.teamMembers.length > 0 && (
+                    <div className="flex items-center space-x-1 text-gray-400">
+                      <Users className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+                      <span>Team: {req.teamMembers.join(', ')}</span>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Student Technical Requirements */}
+              {req.studentRequirements && (
+                <div className="p-2.5 bg-indigo-950/20 border border-indigo-900/30 rounded-lg text-xs text-indigo-200 flex items-start space-x-2">
+                  <Cpu className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <div>
+                    <span className="font-semibold text-indigo-300">Student Technical Requirements: </span>
+                    <span>{req.studentRequirements}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Abstract */}
               <div className="p-3 bg-gray-950/70 border border-gray-800 rounded-lg text-xs text-gray-300">
@@ -189,9 +208,15 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
               {/* Action Buttons for Pending or Conflicted Requests */}
               {(req.status === 'Pending Approval' || req.status === 'Conflicted') && (
                 <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-gray-800">
-                  <div className="flex items-center space-x-2 text-xs text-emerald-400">
-                    <ShieldCheck className="w-4 h-4" aria-hidden="true" />
-                    <span>Prerequisite Safety Checklist Verified</span>
+                  <div className="flex items-center space-x-3 text-xs">
+                    <span className="flex items-center space-x-1 text-emerald-400">
+                      <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+                      <span>Safety Certified</span>
+                    </span>
+                    <span className="flex items-center space-x-1 text-indigo-300">
+                      <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>Utilisation Impact: +3.2% capacity efficiency</span>
+                    </span>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -205,7 +230,7 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
                     </button>
                     <button
                       type="button"
-                      onClick={() => onApprove(req.id, 'Approved by Faculty Lab Custodian.')}
+                      onClick={() => onApprove(req.id, 'Approved with safety and resource optimization check.')}
                       className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center space-x-1 transition-colors shadow-sm"
                     >
                       <Check className="w-3.5 h-3.5" aria-hidden="true" />

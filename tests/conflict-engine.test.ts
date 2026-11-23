@@ -3,6 +3,7 @@ import {
   calculateDeadlineScore, 
   calculateAcademicPriorityScore, 
   calculateEquityScore, 
+  calculateRequirementsScore,
   scoreCandidate, 
   resolveSchedulingConflict 
 } from '../lib/conflict-engine';
@@ -43,6 +44,18 @@ describe('Intelligent Conflict Resolution & Fair Scheduling Engine', () => {
     expect(lowUsageScore).toBeGreaterThan(highUsageScore);
   });
 
+  it('evaluates student technical requirements against hardware capabilities', () => {
+    const dgxItem = INITIAL_EQUIPMENT.find(e => e.id === 'eq-cs-01')!;
+    const highReq = 'Requires 80GB VRAM, CUDA 12.2, 3D tensor processing';
+    const moderateReq = 'Requires 24GB VRAM, PyTorch audio diffusion';
+
+    const scoreHigh = calculateRequirementsScore(highReq, dgxItem);
+    const scoreModerate = calculateRequirementsScore(moderateReq, dgxItem);
+
+    expect(scoreHigh).toBe(100);
+    expect(scoreModerate).toBe(95);
+  });
+
   it('zeros fairness score if safety prerequisite training is incomplete', () => {
     const uncertifiedReq: ProjectAccessRequest = {
       id: 'req-test',
@@ -54,6 +67,9 @@ describe('Intelligent Conflict Resolution & Fair Scheduling Engine', () => {
       projectDescription: 'Testing high power lasers without certified training.',
       projectCategory: 'Capstone / Final Year Thesis',
       facultyAdvisor: 'Dr. Test',
+      courseOrGrantCode: 'TEST-101',
+      teamMembers: [],
+      studentRequirements: 'Safety goggles and 500W laser power bench',
       projectDeadline: '2026-11-26',
       urgency: 'Critical (<= 48h)',
       equipmentId: 'eq-cs-01',
@@ -82,6 +98,9 @@ describe('Intelligent Conflict Resolution & Fair Scheduling Engine', () => {
       projectDescription: 'Final year capstone deadline in 48 hours.',
       projectCategory: 'Capstone / Final Year Thesis',
       facultyAdvisor: 'Dr. Thorne',
+      courseOrGrantCode: 'CS-499',
+      teamMembers: ['Sarah Jenkins (CS21B12)'],
+      studentRequirements: 'Requires 80GB VRAM, CUDA 12.2',
       projectDeadline: '2026-11-25',
       urgency: 'Critical (<= 48h)',
       equipmentId: 'eq-cs-01',
@@ -102,6 +121,9 @@ describe('Intelligent Conflict Resolution & Fair Scheduling Engine', () => {
       projectDescription: 'Club hackathon project next month.',
       projectCategory: 'Student Club / Innovation Contest',
       facultyAdvisor: 'Prof. Vance',
+      courseOrGrantCode: 'CLUB-2026',
+      teamMembers: [],
+      studentRequirements: 'Requires 24GB VRAM, audio diffusion',
       projectDeadline: '2026-12-20',
       urgency: 'Low (> 2 weeks)',
       equipmentId: 'eq-cs-01',
@@ -118,6 +140,7 @@ describe('Intelligent Conflict Resolution & Fair Scheduling Engine', () => {
     expect(resolution.primaryWinnerName).toBe('Zubair Patel');
     expect(resolution.alternativeOffers.length).toBe(1);
     expect(resolution.alternativeOffers[0].requestId).toBe('req-club');
-    expect(resolution.rationale).toContain('Zubair Patel');
+    expect(resolution.alternativeOffers[0].feasibilityFitScore).toBeGreaterThan(90);
+    expect(resolution.utilizationImpact.campusEfficiencyGain).toContain('+18.4%');
   });
 });

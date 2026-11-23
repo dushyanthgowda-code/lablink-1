@@ -1,4 +1,4 @@
-import { EquipmentItem, ProjectAccessRequest, Department } from './types';
+import { EquipmentItem, ProjectAccessRequest } from './types';
 
 export const INITIAL_EQUIPMENT: EquipmentItem[] = [
   // 1. Computer Science & AI
@@ -23,7 +23,13 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Aris Thorne',
     custodianEmail: 'a.thorne@campus.edu',
     totalHoursBookedThisMonth: 182,
-    equivalentItemIds: ['eq-rob-02', 'eq-cs-02']
+    equivalentItemIds: ['eq-cs-02', 'eq-rob-01'],
+    availableHoursDaily: [
+      { startTime: '08:00', endTime: '10:00', isOccupied: false },
+      { startTime: '10:00', endTime: '14:00', isOccupied: true, bookedBy: 'Contested (2 Requests)' },
+      { startTime: '14:00', endTime: '18:00', isOccupied: false },
+      { startTime: '18:00', endTime: '22:00', isOccupied: false }
+    ]
   },
   {
     id: 'eq-cs-02',
@@ -45,7 +51,12 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Evelyn Reed',
     custodianEmail: 'e.reed@campus.edu',
     totalHoursBookedThisMonth: 95,
-    equivalentItemIds: ['eq-cs-01', 'eq-rob-02']
+    equivalentItemIds: ['eq-cs-01'],
+    availableHoursDaily: [
+      { startTime: '08:00', endTime: '12:00', isOccupied: false },
+      { startTime: '12:00', endTime: '16:00', isOccupied: false },
+      { startTime: '16:00', endTime: '20:00', isOccupied: false }
+    ]
   },
 
   // 2. Electronics & Communication
@@ -69,7 +80,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Prof. Marcus Vance',
     custodianEmail: 'm.vance@campus.edu',
     totalHoursBookedThisMonth: 78,
-    equivalentItemIds: ['eq-ece-02']
+    equivalentItemIds: ['eq-ece-02'],
+    availableHoursDaily: [
+      { startTime: '09:00', endTime: '13:00', isOccupied: false },
+      { startTime: '13:00', endTime: '17:00', isOccupied: false }
+    ]
   },
   {
     id: 'eq-ece-02',
@@ -91,7 +106,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Prof. Marcus Vance',
     custodianEmail: 'm.vance@campus.edu',
     totalHoursBookedThisMonth: 64,
-    equivalentItemIds: ['eq-ece-01']
+    equivalentItemIds: ['eq-ece-01'],
+    availableHoursDaily: [
+      { startTime: '09:00', endTime: '13:00', isOccupied: false },
+      { startTime: '13:00', endTime: '17:00', isOccupied: false }
+    ]
   },
   {
     id: 'eq-ece-03',
@@ -113,7 +132,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Priya Sharma',
     custodianEmail: 'p.sharma@campus.edu',
     totalHoursBookedThisMonth: 42,
-    equivalentItemIds: ['eq-rob-01']
+    equivalentItemIds: ['eq-rob-01'],
+    availableHoursDaily: [
+      { startTime: '10:00', endTime: '14:00', isOccupied: false },
+      { startTime: '14:00', endTime: '18:00', isOccupied: false }
+    ]
   },
 
   // 3. Robotics & Automation
@@ -137,7 +160,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Henrik Lindqvist',
     custodianEmail: 'h.lindqvist@campus.edu',
     totalHoursBookedThisMonth: 110,
-    equivalentItemIds: ['eq-ece-03']
+    equivalentItemIds: ['eq-ece-03'],
+    availableHoursDaily: [
+      { startTime: '09:00', endTime: '13:00', isOccupied: false },
+      { startTime: '13:00', endTime: '17:00', isOccupied: false }
+    ]
   },
   {
     id: 'eq-rob-02',
@@ -159,7 +186,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Henrik Lindqvist',
     custodianEmail: 'h.lindqvist@campus.edu',
     totalHoursBookedThisMonth: 88,
-    equivalentItemIds: []
+    equivalentItemIds: [],
+    availableHoursDaily: [
+      { startTime: '10:00', endTime: '14:00', isOccupied: false },
+      { startTime: '14:00', endTime: '18:00', isOccupied: false }
+    ]
   },
   {
     id: 'eq-rob-03',
@@ -181,7 +212,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Prof. Sean O\'Connor',
     custodianEmail: 's.oconnor@campus.edu',
     totalHoursBookedThisMonth: 145,
-    equivalentItemIds: []
+    equivalentItemIds: [],
+    availableHoursDaily: [
+      { startTime: '08:00', endTime: '12:00', isOccupied: false },
+      { startTime: '12:00', endTime: '18:00', isOccupied: false }
+    ]
   },
 
   // 4. Biotechnology & Materials
@@ -205,7 +240,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Clara Montero',
     custodianEmail: 'c.montero@campus.edu',
     totalHoursBookedThisMonth: 120,
-    equivalentItemIds: []
+    equivalentItemIds: [],
+    availableHoursDaily: [
+      { startTime: '09:00', endTime: '13:00', isOccupied: false },
+      { startTime: '13:00', endTime: '17:00', isOccupied: false }
+    ]
   },
   {
     id: 'eq-bio-02',
@@ -227,7 +266,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Dr. Clara Montero',
     custodianEmail: 'c.montero@campus.edu',
     totalHoursBookedThisMonth: 110,
-    equivalentItemIds: []
+    equivalentItemIds: [],
+    availableHoursDaily: [
+      { startTime: '09:00', endTime: '14:00', isOccupied: false },
+      { startTime: '14:00', endTime: '18:00', isOccupied: false }
+    ]
   },
 
   // 5. Applied Physics & Nanotech
@@ -251,7 +294,11 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
     custodianFaculty: 'Prof. Nathan Gallagher',
     custodianEmail: 'n.gallagher@campus.edu',
     totalHoursBookedThisMonth: 160,
-    equivalentItemIds: []
+    equivalentItemIds: [],
+    availableHoursDaily: [
+      { startTime: '08:30', endTime: '12:30', isOccupied: false },
+      { startTime: '13:00', endTime: '17:00', isOccupied: false }
+    ]
   }
 ];
 
@@ -267,6 +314,9 @@ export const INITIAL_REQUESTS: ProjectAccessRequest[] = [
     projectDescription: 'Training a 3D-UNet with Vision Transformer backbone on 15,000 laparoscopic video frames for our final year capstone thesis deadline.',
     projectCategory: 'Capstone / Final Year Thesis',
     facultyAdvisor: 'Dr. Aris Thorne',
+    courseOrGrantCode: 'CS-499 Senior Capstone',
+    teamMembers: ['Sarah Jenkins (CS21B12)', 'Kevin Liu (CS21B45)'],
+    studentRequirements: 'Requires minimum 80GB VRAM, CUDA 12.2, PyTorch 2.4, and FP16 mixed precision execution for 3D medical tensor processing.',
     projectDeadline: '2026-11-25', // Impending deadline: 2 days away!
     urgency: 'Critical (<= 48h)',
     equipmentId: 'eq-cs-01',
@@ -290,6 +340,9 @@ export const INITIAL_REQUESTS: ProjectAccessRequest[] = [
     projectDescription: 'Experimenting with latent diffusion models for music stem generation for the upcoming campus hackathon showcase next month.',
     projectCategory: 'Student Club / Innovation Contest',
     facultyAdvisor: 'Prof. Marcus Vance',
+    courseOrGrantCode: 'INNOV-CLUB-2026',
+    teamMembers: ['Rohan Verma (EC22B08)'],
+    studentRequirements: 'Requires PyTorch audio diffusion with >=24GB VRAM. Compatible with standard dual-GPU setup.',
     projectDeadline: '2026-12-18', // Deadline: 3.5 weeks away
     urgency: 'Low (> 2 weeks)',
     equipmentId: 'eq-cs-01',
@@ -315,6 +368,9 @@ export const INITIAL_REQUESTS: ProjectAccessRequest[] = [
     projectDescription: 'Bench testing ROS2 motor controllers and real-time lidar obstacle avoidance on the Jetson Orin Nano bench pack.',
     projectCategory: 'Funded Research Grant',
     facultyAdvisor: 'Dr. Henrik Lindqvist',
+    courseOrGrantCode: 'AGRI-ROBOTICS-GRANT-404',
+    teamMembers: ['Nadia Osei (ROB21B02)'],
+    studentRequirements: 'ROS2 Humble environment, 12V 5A regulated bench power supply, and dual CSI camera breakout.',
     projectDeadline: '2026-11-29',
     urgency: 'High (<= 1 week)',
     equipmentId: 'eq-rob-01',
@@ -340,6 +396,9 @@ export const INITIAL_REQUESTS: ProjectAccessRequest[] = [
     projectDescription: 'Conducting SYBR Green quantitative fluorescence assays using the CFX96 real-time PCR instrument.',
     projectCategory: 'Capstone / Final Year Thesis',
     facultyAdvisor: 'Dr. Clara Montero',
+    courseOrGrantCode: 'BIO-490 Senior Thesis',
+    teamMembers: ['Aditya Roy (BIO21B17)'],
+    studentRequirements: 'FAM/SYBR fluorophore detection filter calibrated, clean laminar hood bench access, biohazard waste bin.',
     projectDeadline: '2026-12-05',
     urgency: 'Medium (<= 2 weeks)',
     equipmentId: 'eq-bio-01',

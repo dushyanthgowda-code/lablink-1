@@ -16,7 +16,9 @@ import {
   ShieldCheck, 
   AlertCircle, 
   CheckCircle, 
-  Send 
+  Send,
+  Users,
+  Cpu
 } from 'lucide-react';
 import { ProjectAccessRequestSchema } from '@/lib/validation';
 
@@ -64,6 +66,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [projectDescription, setProjectDescription] = useState('');
   const [projectCategory, setProjectCategory] = useState<ProjectCategory>('Capstone / Final Year Thesis');
   const [facultyAdvisor, setFacultyAdvisor] = useState('Dr. Aris Thorne');
+  const [courseOrGrantCode, setCourseOrGrantCode] = useState('CS-499 Senior Capstone');
+  const [teamMembersInput, setTeamMembersInput] = useState('Sarah Jenkins (CS21B12), Kevin Liu (CS21B45)');
+  const [studentRequirements, setStudentRequirements] = useState('Requires minimum 32GB GPU VRAM, PyTorch 2.4, CUDA 12.2 environment, and FP16 support.');
   
   // Tomorrow as default booking date
   const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -97,6 +102,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     e.preventDefault();
     setFormErrors([]);
 
+    const teamList = teamMembersInput
+      .split(',')
+      .map(m => m.trim())
+      .filter(m => m.length > 0);
+
     const payload = {
       studentId,
       studentName,
@@ -106,6 +116,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       projectDescription,
       projectCategory,
       facultyAdvisor,
+      courseOrGrantCode,
+      teamMembers: teamList,
+      studentRequirements,
       projectDeadline,
       urgency,
       equipmentId: equipment.id,
@@ -265,28 +278,75 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <legend className="text-xs font-bold text-indigo-400 px-2 uppercase tracking-wider">
                 Project Classification & Deadlines
               </legend>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="project-title" className="block text-xs font-medium text-gray-300 mb-1">
+                    Project Title
+                  </label>
+                  <input
+                    id="project-title"
+                    type="text"
+                    required
+                    placeholder="e.g., Autonomous Aerial SLAM for Disaster Zones"
+                    value={projectTitle}
+                    onChange={(e) => setProjectTitle(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-sm text-white focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="course-code" className="block text-xs font-medium text-gray-300 mb-1">
+                    Course / Research Grant Reference
+                  </label>
+                  <input
+                    id="course-code"
+                    type="text"
+                    required
+                    placeholder="e.g., CS-499 Capstone or DST-GRANT-88"
+                    value={courseOrGrantCode}
+                    onChange={(e) => setCourseOrGrantCode(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-sm text-white focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label htmlFor="project-title" className="block text-xs font-medium text-gray-300 mb-1">
-                  Project Title
+                <label htmlFor="team-members" className="block text-xs font-medium text-gray-300 mb-1 flex items-center space-x-1">
+                  <Users className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+                  <span>Team Collaborators (Comma-separated)</span>
                 </label>
                 <input
-                  id="project-title"
+                  id="team-members"
+                  type="text"
+                  placeholder="e.g., Ananya Rao (CS21B04), Vikram Malhotra (CS21B19)"
+                  value={teamMembersInput}
+                  onChange={(e) => setTeamMembersInput(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-sm text-white focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="student-requirements" className="block text-xs font-medium text-gray-300 mb-1 flex items-center space-x-1">
+                  <Cpu className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+                  <span>Student Technical Requirements (Min VRAM, OS, Voltage, Safety Kit)</span>
+                </label>
+                <input
+                  id="student-requirements"
                   type="text"
                   required
-                  placeholder="e.g., Autonomous Aerial SLAM for Disaster Zones"
-                  value={projectTitle}
-                  onChange={(e) => setProjectTitle(e.target.value)}
+                  placeholder="e.g., Requires minimum 32GB VRAM, CUDA 12.2, Ubuntu 22.04 environment..."
+                  value={studentRequirements}
+                  onChange={(e) => setStudentRequirements(e.target.value)}
                   className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-sm text-white focus:border-indigo-500"
                 />
               </div>
 
               <div>
                 <label htmlFor="project-desc" className="block text-xs font-medium text-gray-300 mb-1">
-                  Project Abstract & Equipment Justification (min 20 chars)
+                  Project Abstract & Milestone Justification (min 20 chars)
                 </label>
                 <textarea
                   id="project-desc"
-                  rows={3}
+                  rows={2}
                   required
                   placeholder="Explain why this specialised equipment or workstation is needed for your project milestones..."
                   value={projectDescription}

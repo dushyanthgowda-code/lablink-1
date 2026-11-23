@@ -13,13 +13,13 @@ import {
   Scale, 
   Clock, 
   Calendar, 
-  ArrowRight, 
   Layers, 
   Check, 
   Bot,
   User,
   ShieldCheck,
-  Zap
+  Cpu,
+  TrendingUp
 } from 'lucide-react';
 import { resolveSchedulingConflict } from '@/lib/conflict-engine';
 
@@ -46,7 +46,7 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
     conflictId: string, 
     equipment: EquipmentItem, 
     competingRequests: ProjectAccessRequest[]
-  ) => {
+  ): Promise<void> => {
     setResolvingId(conflictId);
     try {
       const res = await fetch('/api/ai/resolve-conflict', {
@@ -63,14 +63,14 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
       if (res.ok) {
         const data = await res.json();
         if (data.resolution) {
-          setActiveResolutions(prev => ({ ...prev, [conflictId]: data.resolution }));
+          setActiveResolutions(prev => ({ ...prev, [conflictId]: data.resolution as ConflictResolutionRecommendation }));
         }
       } else {
-        // Fallback locally if network/backend error
         const localRes = resolveSchedulingConflict(conflictId, equipment, allEquipment, competingRequests);
         setActiveResolutions(prev => ({ ...prev, [conflictId]: localRes }));
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      console.warn('Network error in conflict resolution, using deterministic engine:', err);
       const localRes = resolveSchedulingConflict(conflictId, equipment, allEquipment, competingRequests);
       setActiveResolutions(prev => ({ ...prev, [conflictId]: localRes }));
     } finally {
@@ -192,6 +192,15 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
                           <p className="text-gray-400 line-clamp-2">{req.projectDescription}</p>
                         </div>
 
+                        {/* Student Requirements */}
+                        <div className="mt-2.5 p-2 bg-indigo-950/30 border border-indigo-900/40 rounded text-[11px] text-gray-300">
+                          <span className="text-indigo-400 font-semibold flex items-center space-x-1 mb-0.5">
+                            <Cpu className="w-3 h-3" aria-hidden="true" />
+                            <span>Student Technical Requirements:</span>
+                          </span>
+                          <p>{req.studentRequirements}</p>
+                        </div>
+
                         <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                           <div>
                             <span className="text-gray-400">Deadline: </span>
@@ -225,7 +234,7 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
                                       {candidateScore.scores.compositeFairnessScore} / 100
                                     </span>
                                   </div>
-                                  <div className="grid grid-cols-3 gap-1 text-[10px] text-gray-400 text-center">
+                                  <div className="grid grid-cols-4 gap-1 text-[10px] text-gray-400 text-center">
                                     <div className="bg-gray-900 p-1 rounded">
                                       <span>Deadline</span>
                                       <p className="font-bold text-gray-200">{candidateScore.scores.deadlineUrgencyScore}</p>
@@ -237,6 +246,10 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
                                     <div className="bg-gray-900 p-1 rounded">
                                       <span>Equity</span>
                                       <p className="font-bold text-gray-200">{candidateScore.scores.historicalEquityScore}</p>
+                                    </div>
+                                    <div className="bg-gray-900 p-1 rounded">
+                                      <span>Feasibility</span>
+                                      <p className="font-bold text-gray-200">{candidateScore.scores.requirementsFeasibilityScore}</p>
                                     </div>
                                   </div>
                                 </div>
@@ -251,11 +264,19 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
                   {/* Resolution Recommendation Card */}
                   {resolution && (
                     <div className="p-5 rounded-2xl bg-indigo-950/40 border border-indigo-500/40 space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Bot className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-                        <h4 className="text-sm font-bold text-indigo-300">
-                          AI Fair Allocation Recommendation
-                        </h4>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Bot className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+                          <h4 className="text-sm font-bold text-indigo-300">
+                            AI Fair Allocation Recommendation
+                          </h4>
+                        </div>
+                        {resolution.utilizationImpact && (
+                          <div className="flex items-center space-x-1.5 text-xs text-emerald-400 bg-emerald-950/50 border border-emerald-500/40 px-2.5 py-1 rounded-lg">
+                            <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
+                            <span>Efficiency Gain: {resolution.utilizationImpact.campusEfficiencyGain}</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Transparent Rationale */}
@@ -282,6 +303,9 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
                                     <span className="font-bold text-white">{offer.studentName}</span>
                                     <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-semibold">
                                       {offer.type}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px]">
+                                      {offer.feasibilityFitScore}% Fit
                                     </span>
                                   </div>
                                   <p className="text-gray-300 mt-1">{offer.details}</p>

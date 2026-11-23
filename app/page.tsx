@@ -9,7 +9,11 @@ import { ConflictResolverView } from '@/components/conflicts/ConflictResolverVie
 import { FacultyApprovalDesk } from '@/components/faculty/FacultyApprovalDesk';
 import { UtilizationDashboard } from '@/components/analytics/UtilizationDashboard';
 import { ToastNotification, ToastMessage } from '@/components/ui/ToastNotification';
-import { EquipmentItem, ConflictResolutionRecommendation } from '@/lib/types';
+import { 
+  EquipmentItem, 
+  ConflictResolutionRecommendation, 
+  ProjectAccessRequest 
+} from '@/lib/types';
 
 export default function HomePage() {
   const {
@@ -46,7 +50,9 @@ export default function HomePage() {
     setIsBookingModalOpen(true);
   };
 
-  const handleSubmitBooking = (reqData: any) => {
+  const handleSubmitBooking = (
+    reqData: Omit<ProjectAccessRequest, 'id' | 'status' | 'createdAt' | 'studentUsageHoursPastMonth'>
+  ) => {
     const newReq = submitRequest(reqData);
     if (newReq.status === 'Conflicted') {
       addToast(

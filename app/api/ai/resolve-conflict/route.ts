@@ -40,12 +40,12 @@ A scheduling clash occurred on equipment: "${targetEquipment.name}" (${targetEqu
 Conflicting Slot: ${baseResolution.conflictingSlot.date} from ${baseResolution.conflictingSlot.startTime} to ${baseResolution.conflictingSlot.endTime}.
 
 Candidates:
-${baseResolution.candidates.map((c, i) => `${i + 1}. Student: ${c.request.studentName} | Project: "${c.request.projectTitle}" (${c.request.projectCategory}) | Deadline: ${c.request.projectDeadline} | Past Hours Booked This Month: ${c.request.studentUsageHoursPastMonth}h | Fairness Score: ${c.scores.compositeFairnessScore}/100`).join('\n')}
+${baseResolution.candidates.map((c, i) => `${i + 1}. Student: ${c.request.studentName} | Project: "${c.request.projectTitle}" (${c.request.projectCategory}) | Requirements: ${c.request.studentRequirements} | Deadline: ${c.request.projectDeadline} | Past Hours Booked: ${c.request.studentUsageHoursPastMonth}h | Fairness Score: ${c.scores.compositeFairnessScore}/100`).join('\n')}
 
 The algorithmic winner is ${baseResolution.primaryWinnerName}.
 Alternative arrangement offered to runner up: ${JSON.stringify(baseResolution.alternativeOffers)}
 
-Write a professional, diplomatic, and transparent 2-to-3 sentence explanation explaining why this allocation upholds academic integrity, deadline urgency, and resource equity, while reassuring the non-allocated student that their project progress is preserved.`;
+Write a professional, diplomatic, and transparent 2-to-3 sentence explanation explaining why this allocation upholds academic integrity, deadline urgency, student technical requirements, and resource equity, while reassuring the non-allocated student that their project progress is preserved.`;
 
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -66,7 +66,7 @@ Write a professional, diplomatic, and transparent 2-to-3 sentence explanation ex
             baseResolution.rationale = llmText;
           }
         }
-      } catch (geminiErr) {
+      } catch (geminiErr: unknown) {
         console.warn('Gemini conflict synthesis error, using algorithmic rationale:', geminiErr);
       }
     }
@@ -75,9 +75,10 @@ Write a professional, diplomatic, and transparent 2-to-3 sentence explanation ex
       success: true,
       resolution: baseResolution
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : 'Failed to resolve scheduling conflict';
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to resolve scheduling conflict' },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

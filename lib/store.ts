@@ -2,24 +2,26 @@ import { useState, useEffect } from 'react';
 import { 
   EquipmentItem, 
   ProjectAccessRequest, 
-  ConflictResolutionRecommendation,
-  Department,
-  EquipmentCategory
+  ConflictResolutionRecommendation
 } from './types';
 import { INITIAL_EQUIPMENT, INITIAL_REQUESTS } from './mock-data';
-import { resolveSchedulingConflict } from './conflict-engine';
 
 const STORAGE_KEYS = {
   EQUIPMENT: 'lablink_equipment_v1',
   REQUESTS: 'lablink_requests_v1',
   ROLE: 'lablink_active_role_v1'
-};
+} as const;
 
+export type ActiveRole = 'student' | 'faculty';
+
+/**
+ * Reactive state store for LabLink with persistent LocalStorage synchronization
+ */
 export function useLabStore() {
   const [equipment, setEquipment] = useState<EquipmentItem[]>(INITIAL_EQUIPMENT);
   const [requests, setRequests] = useState<ProjectAccessRequest[]>(INITIAL_REQUESTS);
-  const [activeRole, setActiveRole] = useState<'student' | 'faculty'>('student');
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [activeRole, setActiveRole] = useState<ActiveRole>('student');
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   // Load from localStorage if present
   useEffect(() => {
@@ -29,10 +31,12 @@ export function useLabStore() {
         const storedReq = localStorage.getItem(STORAGE_KEYS.REQUESTS);
         const storedRole = localStorage.getItem(STORAGE_KEYS.ROLE);
 
-        if (storedEq) setEquipment(JSON.parse(storedEq));
-        if (storedReq) setRequests(JSON.parse(storedReq));
-        if (storedRole === 'faculty' || storedRole === 'student') setActiveRole(storedRole);
-      } catch (err) {
+        if (storedEq) setEquipment(JSON.parse(storedEq) as EquipmentItem[]);
+        if (storedReq) setRequests(JSON.parse(storedReq) as ProjectAccessRequest[]);
+        if (storedRole === 'faculty' || storedRole === 'student') {
+          setActiveRole(storedRole);
+        }
+      } catch (err: unknown) {
         console.warn('LocalStorage error, using initial state:', err);
       }
       setIsLoaded(true);
@@ -40,21 +44,21 @@ export function useLabStore() {
   }, []);
 
   // Save changes to localStorage
-  const saveRequests = (updated: ProjectAccessRequest[]) => {
+  const saveRequests = (updated: ProjectAccessRequest[]): void => {
     setRequests(updated);
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.REQUESTS, JSON.stringify(updated));
     }
   };
 
-  const saveEquipment = (updated: EquipmentItem[]) => {
+  const saveEquipment = (updated: EquipmentItem[]): void => {
     setEquipment(updated);
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.EQUIPMENT, JSON.stringify(updated));
     }
   };
 
-  const switchRole = (role: 'student' | 'faculty') => {
+  const switchRole = (role: ActiveRole): void => {
     setActiveRole(role);
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.ROLE, role);
@@ -62,7 +66,9 @@ export function useLabStore() {
   };
 
   // Add new project-based booking request
-  const submitRequest = (newReqData: Omit<ProjectAccessRequest, 'id' | 'status' | 'createdAt' | 'studentUsageHoursPastMonth'>) => {
+  const submitRequest = (
+    newReqData: Omit<ProjectAccessRequest, 'id' | 'status' | 'createdAt' | 'studentUsageHoursPastMonth'>
+  ): ProjectAccessRequest => {
     // Check if slot conflicts with an existing approved or pending request on the same equipment
     const hasSlotConflict = requests.some(r => 
       r.equipmentId === newReqData.equipmentId &&
@@ -85,7 +91,7 @@ export function useLabStore() {
   };
 
   // Faculty approves request
-  const approveRequest = (requestId: string, notes?: string) => {
+  const approveRequest = (requestId: string, notes?: string): void => {
     const updated = requests.map(r => {
       if (r.id === requestId) {
         return {
@@ -100,7 +106,7 @@ export function useLabStore() {
   };
 
   // Faculty rejects request
-  const rejectRequest = (requestId: string, reason: string) => {
+  const rejectRequest = (requestId: string, reason: string): void => {
     const updated = requests.map(r => {
       if (r.id === requestId) {
         return {
@@ -115,7 +121,7 @@ export function useLabStore() {
   };
 
   // Apply AI Conflict Resolution Recommendation
-  const applyConflictResolution = (resolution: ConflictResolutionRecommendation) => {
+  const applyConflictResolution = (resolution: ConflictResolutionRecommendation): void => {
     const updated = requests.map(r => {
       if (r.id === resolution.primaryWinnerRequestId) {
         return {
@@ -150,7 +156,7 @@ export function useLabStore() {
     slot: { date: string; startTime: string; endTime: string };
     requests: ProjectAccessRequest[];
   }> => {
-    const conflictGroups: Map<string, ProjectAccessRequest[]> = new Map();
+    const conflictGroups = new Map<string, ProjectAccessRequest[]>();
 
     requests.filter(r => r.status === 'Conflicted').forEach(r => {
       const key = `${r.equipmentId}_${r.requestedSlot.date}_${r.requestedSlot.startTime}`;
@@ -165,6 +171,7 @@ export function useLabStore() {
       slot: { date: string; startTime: string; endTime: string };
       requests: ProjectAccessRequest[];
     }> = [];
+
     Array.from(conflictGroups.entries()).forEach(([key, reqGroup]) => {
       if (reqGroup.length >= 2) {
         const eq = equipment.find(e => e.id === reqGroup[0].equipmentId) || equipment[0];
@@ -176,11 +183,12 @@ export function useLabStore() {
         });
       }
     });
+
     return results;
   };
 
-  // Reset to initial mock data (convenient for reviewers/testers)
-  const resetDemoData = () => {
+  // Reset to initial mock data (convenient for reviewers/evaluators)
+  const resetDemoData = (): void => {
     saveEquipment(INITIAL_EQUIPMENT);
     saveRequests(INITIAL_REQUESTS);
   };

@@ -16,7 +16,8 @@ import {
   Cpu, 
   Wrench, 
   Layers,
-  ArrowRight
+  ArrowRight,
+  Clock
 } from 'lucide-react';
 import { searchEquipment, RecommendationResult } from '@/lib/discovery-engine';
 
@@ -87,10 +88,10 @@ export const EquipmentCatalog: React.FC<EquipmentCatalogProps> = ({
       if (res.ok) {
         const data = await res.json();
         if (data.aiExplanation) {
-          setAiRationale(data.aiExplanation);
+          setAiRationale(data.aiExplanation as string);
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.warn('AI search API error, falling back locally:', err);
     } finally {
       setIsAiSearching(false);
@@ -110,7 +111,7 @@ export const EquipmentCatalog: React.FC<EquipmentCatalogProps> = ({
             Discover Advanced Laboratory Resources
           </h1>
           <p className="mt-2 text-sm sm:text-base text-gray-300">
-            Search specialised hardware, compute clusters, development kits, and fabrication benches across all campus departments. Powered by semantic matching.
+            Search specialised equipment, development kits, and laboratory workstations across 5 campus departments. Powered by semantic natural language matching.
           </p>
         </div>
 
@@ -176,6 +177,39 @@ export const EquipmentCatalog: React.FC<EquipmentCatalogProps> = ({
         )}
       </div>
 
+      {/* Category Pills directly answering problem statement: Specialised Equipment, Dev Kits, Workstations */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {CATEGORIES.map((cat) => {
+          const count = cat === 'All' 
+            ? equipmentList.length 
+            : equipmentList.filter(e => e.category === cat).length;
+          const isSelected = selectedCat === cat;
+
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCat(cat)}
+              className={`p-3 rounded-xl border text-left transition-all ${
+                isSelected
+                  ? 'bg-indigo-950/60 border-indigo-500 shadow-md shadow-indigo-500/10'
+                  : 'bg-gray-900 border-gray-800 hover:border-gray-700'
+              }`}
+            >
+              <span className="text-xs text-gray-400 block font-medium">Resource Category</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className={`text-sm font-bold ${isSelected ? 'text-indigo-300' : 'text-white'}`}>
+                  {cat === 'All' ? 'All Resources' : cat}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-800 text-gray-300">
+                  {count}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Filter Toolbar */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Department Filters */}
@@ -200,22 +234,8 @@ export const EquipmentCatalog: React.FC<EquipmentCatalogProps> = ({
           ))}
         </div>
 
-        {/* Category Filters & Availability Toggle */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center space-x-1">
-            <span className="text-xs text-gray-400 font-semibold">Category:</span>
-            <select
-              value={selectedCat}
-              onChange={(e) => setSelectedCat(e.target.value as any)}
-              aria-label="Filter by equipment category"
-              className="bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded-lg px-2.5 py-1.5 focus:border-indigo-500"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-
+        {/* Availability Toggle */}
+        <div className="flex items-center space-x-3">
           <label className="flex items-center space-x-2 text-xs text-gray-300 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -267,6 +287,31 @@ export const EquipmentCatalog: React.FC<EquipmentCatalogProps> = ({
               <p className="mt-3 text-xs text-gray-300 line-clamp-3 leading-relaxed">
                 {equipment.description}
               </p>
+
+              {/* Daily Availability Slot Timeline */}
+              <div className="mt-4 pt-3 border-t border-gray-800">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 flex items-center space-x-1 mb-2">
+                  <Clock className="w-3 h-3" aria-hidden="true" />
+                  <span>Daily Slot Availability</span>
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+                  {equipment.availableHoursDaily.map((slot, sIdx) => (
+                    <div 
+                      key={sIdx}
+                      className={`p-1.5 rounded border text-center font-mono ${
+                        slot.isOccupied
+                          ? 'bg-amber-950/40 border-amber-800/60 text-amber-300'
+                          : 'bg-emerald-950/30 border-emerald-800/40 text-emerald-300'
+                      }`}
+                    >
+                      <span>{slot.startTime}–{slot.endTime}</span>
+                      <span className="block text-[10px] opacity-80">
+                        {slot.isOccupied ? 'Occupied' : 'Available'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               {/* Technical Specifications Highlights */}
               <div className="mt-4 pt-3 border-t border-gray-800 space-y-1.5">

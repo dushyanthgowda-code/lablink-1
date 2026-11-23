@@ -47,7 +47,7 @@ Provide a concise, highly insightful 2-sentence recommendation to the student ex
           const data = await response.json();
           aiExplanation = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
         }
-      } catch (geminiErr) {
+      } catch (geminiErr: unknown) {
         console.warn('Gemini API fetch error, using fallback narrative:', geminiErr);
       }
     }
@@ -63,9 +63,10 @@ Provide a concise, highly insightful 2-sentence recommendation to the student ex
       results,
       aiExplanation: aiExplanation || 'Displaying available cross-department laboratory resources matching your criteria.'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : 'Failed to process discovery request';
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to process discovery request' },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

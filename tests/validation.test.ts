@@ -24,7 +24,7 @@ describe('Validation & Security Engine', () => {
     expect(parsed.success).toBe(false);
   });
 
-  it('validates a complete project access request', () => {
+  it('validates a complete project access request with requirements and team details', () => {
     const validRequest = {
       studentId: 'STU-1234',
       studentName: 'Aarav Gupta',
@@ -34,6 +34,9 @@ describe('Validation & Security Engine', () => {
       projectDescription: 'Validation of real-time sensor fusion algorithms on Jetson edge board.',
       projectCategory: 'Funded Research Grant',
       facultyAdvisor: 'Dr. Henrik',
+      courseOrGrantCode: 'AGRI-GRANT-2026',
+      teamMembers: ['Nadia (ROB21B02)'],
+      studentRequirements: 'Requires 12V 5A power supply and ROS2 Humble environment.',
       projectDeadline: '2026-11-30',
       urgency: 'High (<= 1 week)',
       equipmentId: 'eq-rob-01',

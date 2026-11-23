@@ -29,6 +29,9 @@ export const ProjectAccessRequestSchema = z.object({
     'Student Club / Innovation Contest'
   ]),
   facultyAdvisor: z.string().min(2).max(100),
+  courseOrGrantCode: z.string().min(2).max(50).default('CAMPUS-PROJECT-2026'),
+  teamMembers: z.array(z.string()).default([]),
+  studentRequirements: z.string().min(5).max(500),
   projectDeadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid deadline date format'),
   urgency: z.enum([
     'Critical (<= 48h)',

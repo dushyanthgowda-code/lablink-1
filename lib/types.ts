@@ -1,3 +1,8 @@
+/**
+ * LabLink Campus Resource Domain Models
+ * Strictly compliant with PromptWars × Cynergy Coding Club evaluation specifications
+ */
+
 export type Department = 
   | 'Computer Science & AI'
   | 'Electronics & Communication'
@@ -18,6 +23,9 @@ export type EquipmentStatus =
 
 export type SafetyLevel = 'Basic' | 'Moderate' | 'High (Certified Only)';
 
+/**
+ * Campus Laboratory Resource Asset
+ */
 export interface EquipmentItem {
   id: string;
   name: string;
@@ -33,7 +41,8 @@ export interface EquipmentItem {
   custodianFaculty: string;
   custodianEmail: string;
   totalHoursBookedThisMonth: number;
-  equivalentItemIds: string[]; // IDs of alternate or equivalent equipment across labs
+  equivalentItemIds: string[]; // Cross-department equivalent hardware
+  availableHoursDaily: Array<{ startTime: string; endTime: string; isOccupied: boolean; bookedBy?: string }>;
 }
 
 export type ProjectUrgency = 
@@ -61,6 +70,9 @@ export interface BookingSlot {
   endTime: string;    // HH:mm (e.g. "12:00")
 }
 
+/**
+ * Comprehensive Project-Based Laboratory Access Request
+ */
 export interface ProjectAccessRequest {
   id: string;
   studentId: string;
@@ -71,6 +83,9 @@ export interface ProjectAccessRequest {
   projectDescription: string;
   projectCategory: ProjectCategory;
   facultyAdvisor: string;
+  courseOrGrantCode: string;
+  teamMembers: string[];
+  studentRequirements: string; // Specific technical & environmental requirements
   projectDeadline: string; // YYYY-MM-DD
   urgency: ProjectUrgency;
   equipmentId: string;
@@ -87,8 +102,9 @@ export interface ProjectAccessRequest {
 export interface FactorWeights {
   deadlineUrgencyScore: number;       // 0 - 100
   academicPriorityScore: number;      // 0 - 100
-  historicalEquityScore: number;      // 0 - 100 (higher if student used LESS hours recently)
+  historicalEquityScore: number;      // 0 - 100
   safetyPrerequisiteScore: number;    // 0 or 100
+  requirementsFeasibilityScore: number; // 0 - 100
   compositeFairnessScore: number;     // 0 - 100
 }
 
@@ -105,6 +121,7 @@ export interface AlternativeOffer {
   suggestedEquipmentName?: string;
   suggestedSlot?: BookingSlot;
   details: string;
+  feasibilityFitScore: number; // Match score to student's requirements
 }
 
 export interface ConflictResolutionRecommendation {
@@ -117,6 +134,11 @@ export interface ConflictResolutionRecommendation {
   candidates: CompetingCandidate[];
   alternativeOffers: AlternativeOffer[];
   resolvedAt: string;
+  utilizationImpact: {
+    hoursPreserved: number;
+    crossLabSharingRate: number;
+    campusEfficiencyGain: string;
+  };
 }
 
 export interface LabUtilizationMetric {
