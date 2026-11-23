@@ -198,7 +198,7 @@ export const ConflictResolverView: React.FC<ConflictResolverViewProps> = ({
                             <Cpu className="w-3 h-3" aria-hidden="true" />
                             <span>Student Technical Requirements:</span>
                           </span>
-                          <p>{req.studentRequirements}</p>
+                          <p>{req.studentRequirements || 'Standard laboratory workstation requirements.'}</p>
                         </div>
 
                         <div className="mt-3 grid grid-cols-2 gap-2 text-xs">

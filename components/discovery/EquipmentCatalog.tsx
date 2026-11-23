@@ -295,7 +295,10 @@ export const EquipmentCatalog: React.FC<EquipmentCatalogProps> = ({
                   <span>Daily Slot Availability</span>
                 </span>
                 <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-                  {equipment.availableHoursDaily.map((slot, sIdx) => (
+                  {(equipment.availableHoursDaily || [
+                    { startTime: '09:00', endTime: '13:00', isOccupied: false },
+                    { startTime: '13:00', endTime: '17:00', isOccupied: false }
+                  ]).map((slot, sIdx) => (
                     <div 
                       key={sIdx}
                       className={`p-1.5 rounded border text-center font-mono ${

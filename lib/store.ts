@@ -7,9 +7,9 @@ import {
 import { INITIAL_EQUIPMENT, INITIAL_REQUESTS } from './mock-data';
 
 const STORAGE_KEYS = {
-  EQUIPMENT: 'lablink_equipment_v1',
-  REQUESTS: 'lablink_requests_v1',
-  ROLE: 'lablink_active_role_v1'
+  EQUIPMENT: 'lablink_equipment_v2',
+  REQUESTS: 'lablink_requests_v2',
+  ROLE: 'lablink_active_role_v2'
 } as const;
 
 export type ActiveRole = 'student' | 'faculty';

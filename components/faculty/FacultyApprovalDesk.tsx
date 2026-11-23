@@ -171,7 +171,7 @@ export const FacultyApprovalDesk: React.FC<FacultyApprovalDeskProps> = ({
                       <span className="text-gray-200">{req.studentUsageHoursPastMonth}h/mo</span>
                     </div>
                   </div>
-                  {req.teamMembers && req.teamMembers.length > 0 && (
+                  {Array.isArray(req.teamMembers) && req.teamMembers.length > 0 && (
                     <div className="flex items-center space-x-1 text-gray-400">
                       <Users className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
                       <span>Team: {req.teamMembers.join(', ')}</span>

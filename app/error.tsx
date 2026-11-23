@@ -16,6 +16,20 @@ export default function ErrorBoundary({ error, reset }: ErrorProps) {
     console.error('LabLink System Error captured by boundary:', error);
   }, [error]);
 
+  const handleReset = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+      }
+    } catch {
+      // ignore
+    }
+    reset();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  };
+
   return (
     <div 
       role="alert" 
@@ -32,8 +46,8 @@ export default function ErrorBoundary({ error, reset }: ErrorProps) {
         </p>
         <button
           type="button"
-          onClick={() => reset()}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold inline-flex items-center space-x-2 transition-all shadow-md"
+          onClick={handleReset}
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold inline-flex items-center space-x-2 transition-all shadow-md cursor-pointer"
         >
           <RotateCcw className="w-4 h-4" aria-hidden="true" />
           <span>Reload Lab State</span>
